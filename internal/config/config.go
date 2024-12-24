@@ -2,30 +2,40 @@ package config
 
 import (
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	Server ServerConfig
+	DB DatabaseConfig
 }
 
-type ServerConfig struct {
-	Port string
-	Mode string // gin mode (debug/release)
+type DatabaseConfig struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DBName   string
 }
 
 func LoadConfig() (*Config, error) {
-	config := &Config{
-		Server: ServerConfig{
-			Port: getEnv("SERVER_PORT", "8080"),
-			Mode: getEnv("GIN_MODE", "debug"),
-		},
+	if err := godotenv.Load(); err != nil {
+		return nil, err
 	}
 
-	return config, nil
+	return &Config{
+		DB: DatabaseConfig{
+			Host:     getEnv("DB_HOST", "localhost"),
+			Port:     getEnv("DB_PORT", "5432"),
+			Username: getEnv("DB_USER", "postgres"),
+			Password: getEnv("DB_PASSWORD", ""),
+			DBName:   getEnv("DB_NAME", "car_social"),
+		},
+	}, nil
 }
 
 func getEnv(key, defaultValue string) string {
-	if value, exists := os.LookupEnv(key); exists {
+	if value := os.Getenv(key); value != "" {
 		return value
 	}
 	return defaultValue

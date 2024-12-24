@@ -1,41 +1,35 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/NikitaBelov-mobile/car-social/internal/config"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+	"github.com/NikitaBelov-mobile/car-social/internal/database"
 )
 
 func main() {
-	// Загружаем .env файл
-	if err := godotenv.Load(); err != nil {
-		log.Printf("Error loading .env file: %v", err)
-	}
-
-	// Загружаем конфигурацию
+	// Загрузка конфигурации
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	// Устанавливаем режим Gin
-	gin.SetMode(cfg.Server.Mode)
+	// Подключение к базе данных
+	db, err := database.NewPostgresDB(cfg)
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
 
-	// Инициализируем роутер
-	router := gin.Default()
+	// Получаем экземпляр sql.DB для проверки соединения
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatalf("Failed to get database instance: %v", err)
+	}
 
-	// Простой тестовый эндпоинт
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
+	// Проверяем соединение
+	if err := sqlDB.Ping(); err != nil {
+		log.Fatalf("Failed to ping database: %v", err)
+	}
 
-	// Запускаем сервер
-	serverAddr := fmt.Sprintf(":%s", cfg.Server.Port)
-	log.Printf("Starting server on %s", serverAddr)
-	log.Fatal(router.Run(serverAddr))
+	log.Println("Successfully connected to database")
 }
