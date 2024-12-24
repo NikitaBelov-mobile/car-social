@@ -1,7 +1,7 @@
 linters:
   enable:
     - gofmt
-    - golint
+    - revive        # замена устаревшего golint
     - govet
     - errcheck
     - staticcheck
@@ -9,6 +9,7 @@ linters:
     - ineffassign
     - unused
     - misspell
+    - shadow       # явно включаем проверку shadowing
 
 run:
   deadline: 5m
@@ -22,7 +23,5 @@ issues:
 linters-settings:
   errcheck:
     check-type-assertions: true
-  govet:
-    check-shadowing: true
-  golint:
-    min-confidence: 0
+  revive:
+    min-confidence: 0.8
