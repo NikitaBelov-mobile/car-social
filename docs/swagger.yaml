@@ -1,0 +1,301 @@
+basePath: /
+definitions:
+  auth.ErrorResponse:
+    properties:
+      error:
+        example: описание ошибки
+        type: string
+    type: object
+  auth.LogoutRequest:
+    properties:
+      refresh_token:
+        example: eyJhbGciOiJIUzI1NiIs...
+        type: string
+    required:
+    - refresh_token
+    type: object
+  auth.RefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  auth.Response:
+    properties:
+      message:
+        example: операция выполнена успешно
+        type: string
+    type: object
+  auth.SignInRequest:
+    properties:
+      password:
+        type: string
+      phone:
+        type: string
+    required:
+    - password
+    - phone
+    type: object
+  auth.SignUpRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      phone:
+        type: string
+    required:
+    - password
+    - phone
+    type: object
+  auth.TokensResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  user.ErrorResponse:
+    properties:
+      error:
+        example: описание ошибки
+        type: string
+    type: object
+  user.Response:
+    properties:
+      created_at:
+        example: "2024-03-20 15:04:05"
+        type: string
+      id:
+        example: 1
+        type: integer
+      phone:
+        example: "79991234567"
+        type: string
+    type: object
+  user.UpdateRequest:
+    properties:
+      password:
+        example: newpassword123
+        minLength: 6
+        type: string
+      phone:
+        example: "79991234567"
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API сервер для Car Social приложения
+  title: Car Social API
+  version: "1.0"
+paths:
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Завершение сессии пользователя
+      parameters:
+      - description: Refresh token
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: успешный выход
+          schema:
+            $ref: '#/definitions/auth.Response'
+        "400":
+          description: неверный формат данных
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "500":
+          description: ошибка сервера
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Выход из системы
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Обновление access token с помощью refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: новые токены
+          schema:
+            $ref: '#/definitions/auth.TokensResponse'
+        "400":
+          description: неверный формат данных
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "401":
+          description: невалидный refresh token
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Обновление токена
+      tags:
+      - auth
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Аутентификация пользователя
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: токены доступа
+          schema:
+            $ref: '#/definitions/auth.TokensResponse'
+        "400":
+          description: неверный формат данных
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "401":
+          description: неверные учетные данные
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Вход в систему
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Создание нового пользователя в системе
+      parameters:
+      - description: Данные для регистрации
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: успешная регистрация
+          schema:
+            $ref: '#/definitions/auth.Response'
+        "400":
+          description: неверный формат данных
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "409":
+          description: пользователь уже существует
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+      summary: Регистрация пользователя
+      tags:
+      - auth
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Получение информации о пользователе по ID
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.Response'
+        "400":
+          description: неверный формат ID
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "404":
+          description: пользователь не найден
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Получение пользователя
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Обновление данных пользователя
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные для обновления
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.Response'
+        "400":
+          description: неверный формат данных
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "404":
+          description: пользователь не найден
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "409":
+          description: телефон уже занят
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Обновление пользователя
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

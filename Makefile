@@ -25,3 +25,11 @@ docker-down:
 .PHONY: clean
 clean:
 	rm -rf bin/
+
+.PHONY: migrate-up migrate-down
+
+migrate-up:
+	migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable" up
+
+migrate-down:
+	migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable" down
