@@ -38,20 +38,9 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	// Получаем экземпляр sql.DB для проверки соединения
-	// sqlDB, err := db.D
-	// if err != nil {
-	// 	log.Fatalf("Failed to get database instance: %v", err)
-	// }
-
 	if err := db.Ping(); err != nil {
 		log.Fatalf("Failed to ping database: %v", err)
 	}
-
-	// Проверяем соединение
-	// if err := sqlDB.Ping(); err != nil {
-	// 	log.Fatalf("Failed to ping database: %v", err)
-	// }
 
 	log.Println("Successfully connected to database")
 
@@ -67,11 +56,8 @@ func main() {
 
 	userRoute.Register(&router.RouterGroup)
 	authRoute.Register(&router.RouterGroup)
-	// Добавляем маршрут для swagger
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.Run(":8080")
-
-	// userHandler := user.NewHandler(userDB)
-	// authHandler := auth.NewHandler(userDB, authDB, jwtService)
 }

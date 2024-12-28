@@ -1,7 +1,6 @@
 package token
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
 
@@ -68,14 +67,4 @@ func (m *TokenManager) ParseToken(accessToken string) (int, error) {
 	}
 
 	return claims.UserID, nil
-}
-
-func (s *TokenManager) IsTokenBlacklisted(db *sql.DB, token string) bool {
-	var exists bool
-	query := `SELECT EXISTS(SELECT 1 FROM blacklisted_tokens WHERE token = $1 AND expires_at > NOW())`
-	err := db.QueryRow(query, token).Scan(&exists)
-	if err != nil {
-		return true // В случае ошибки считаем токен недействительным
-	}
-	return exists
 }

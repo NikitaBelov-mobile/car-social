@@ -1,13 +1,17 @@
 module github.com/NikitaBelov-mobile/car-social
 
-go 1.22.3
+go 1.23
+
+toolchain go1.23.4
 
 require github.com/golang-jwt/jwt v3.2.2+incompatible
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/PuerkitoBio/goquery v1.10.0 // indirect
 	github.com/PuerkitoBio/purell v1.2.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
+	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/bytedance/sonic v1.12.6 // indirect
 	github.com/bytedance/sonic/loader v0.2.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
